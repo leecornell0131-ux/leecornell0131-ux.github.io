@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="머신비전 광학 엔지니어 이태우가 AI 에이전트로 만든 비전 SW 3종">
+<title>이태우 AI 활용 사례</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@112,500;112,700;125,800&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* v2: bright single-theme site. Full-bleed alternating bands, calibration-dot hero, white cards. Layout: an optical bench. Left label rail (200px) + reading column; wide "inspection viewport" bands for hero canvas and screenshots. */
+:root{
+  --bg:#FFFFFF; --band:#F4F7FA; --surface:#FFFFFF; --ink:#0E1B2A; --muted:#5A6878; --rule:#DDE4EB;
+  --accent:#1F5FBF; --accent-soft:#EAF1FB; --warm:#C9741F; --probe:#1F5FBF; --ok:#15803D;
+  --scope:#0E1621; --scope-ink:#D8E2E6;
+  --shadow:0 1px 2px rgba(14,27,42,.04),0 10px 30px -12px rgba(14,27,42,.14);
+  --display:"Archivo","IBM Plex Sans KR",system-ui,sans-serif;
+  --body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --data:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  --measure:66ch; color-scheme:light;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 16px/1.75 var(--body);word-break:keep-all;overflow-wrap:break-word;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto}
+a{color:var(--probe)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+h1,h2,h3,h4{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.2}
+p{margin:0}
+.num{font-variant-numeric:tabular-nums}
+strong{font-weight:600}
+
+.bar{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-block:22px;border-bottom:1px solid var(--rule);flex-wrap:wrap}
+.bar .id{font-family:var(--display);font-weight:700;font-stretch:112%;letter-spacing:.02em}
+.bar nav{display:flex;gap:20px;flex-wrap:wrap;font-size:14px}
+.bar nav a{color:var(--muted);text-decoration:none}
+.bar nav a:hover{color:var(--ink)}
+
+/* hero */
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:48px;align-items:center;padding-block:60px 56px}
+.hero h1{font-size:clamp(40px,6vw,72px);font-weight:800;font-stretch:125%;letter-spacing:-.01em}
+.hero h1 small{display:block;font-family:var(--body);font-size:.3em;font-weight:600;letter-spacing:0;margin-top:14px;color:var(--muted)}
+.hero .role{font-family:var(--body);font-weight:700;font-size:clamp(20px,2.2vw,26px);line-height:1.45;margin-top:26px;text-wrap:balance}
+.hero .lede{margin-top:16px;max-width:46ch;color:var(--muted);font-size:16.5px}
+.facts{display:flex;flex-wrap:wrap;gap:12px 30px;margin-top:28px;font-size:13.5px;color:var(--muted)}
+.facts b{display:block;font-family:var(--display);font-stretch:112%;font-size:23px;color:var(--ink);font-weight:700;line-height:1.25}
+
+.scope{background:var(--scope);border-radius:6px;overflow:hidden;color:var(--scope-ink);box-shadow:0 0 0 1px var(--rule)}
+.scope-head,.scope-foot{display:flex;justify-content:space-between;gap:12px;padding:9px 14px;font:400 12px/1.4 var(--data);color:#8FA1AB;flex-wrap:wrap}
+.scope-foot{border-top:1px solid #22303A}
+.scope canvas{display:block;width:100%;height:auto;aspect-ratio:4/3}
+.verdict{font-weight:600;color:#59D38E}
+.verdict.ng{color:#FF7B6E}
+.scope-note{font-size:13px;color:var(--muted);margin-top:10px}
+
+section{padding-block:76px;border-top:1px solid var(--rule)}
+.sec-head{display:grid;grid-template-columns:200px minmax(0,1fr);gap:32px;margin-bottom:44px}
+.sec-head .k{font-size:14px;color:var(--muted);padding-top:9px}
+.sec-head h2{font-size:clamp(28px,3.4vw,40px);font-weight:700;font-stretch:112%}
+.sec-head p{margin-top:14px;max-width:var(--measure);color:var(--muted)}
+.indent{margin-left:232px}
+
+/* stance */
+.stance{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border-top:2px solid var(--ink)}
+.stance > div{padding:22px 24px 4px 0}
+.stance > div + div{padding-left:24px;border-left:1px solid var(--rule)}
+.stance h3{font-size:19px;font-weight:700;font-family:var(--body)}
+.stance ul{margin:10px 0 0;padding-left:18px}.stance li{font-size:15px;color:var(--muted);padding:2px 0}
+.stance .ev{margin-top:12px;font-size:13.5px;color:var(--probe);font-family:var(--data);line-height:1.6}
+.pull{margin-top:44px;max-width:var(--measure);padding:22px 24px;background:var(--surface);border:1px solid var(--rule);border-radius:6px}
+.pull h3{font-family:var(--body);font-size:17px;font-weight:700;margin-top:22px}
+.pull .lead{font-size:17px;font-weight:600;line-height:1.7}
+.pull ul.ex{margin-top:12px;color:var(--muted)}
+.pull ul{margin:10px 0 0;padding-left:18px}.pull li{padding:3px 0;font-size:15.5px}
+.pull b{font-weight:700}
+
+/* map */
+.map{background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:20px;overflow-x:auto}
+.map svg{display:block;width:100%;min-width:640px;height:auto}
+.map text{font-family:var(--body)}
+
+/* projects */
+.ai{display:grid;gap:96px}
+.proj{display:grid;gap:30px}
+.proj-top{display:grid;grid-template-columns:200px minmax(0,1fr);gap:32px}
+.proj-top .idx{font-family:var(--display);font-stretch:125%;font-weight:800;font-size:56px;line-height:1;color:var(--accent)}
+.proj-top .when{font-family:var(--data);font-size:12.5px;color:var(--muted);margin-top:12px;display:block}
+.proj h3{font-size:clamp(24px,2.8vw,32px);font-weight:700;font-stretch:112%}
+.proj .sub{color:var(--muted);margin-top:10px;max-width:var(--measure)}
+.stack{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.stack span{font-size:12.5px;padding:3px 10px;border:1px solid var(--rule);border-radius:999px;color:var(--muted)}
+figure{margin:0}
+.shot{background:var(--scope);border-radius:6px;overflow:hidden;box-shadow:0 0 0 1px var(--rule)}
+.shot img{display:block;width:100%;height:auto}
+figcaption{font-size:13.5px;color:var(--muted);margin-top:10px;max-width:90ch}
+.shots2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px}
+.cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px}
+.cols h4{margin:0 0 8px;font-size:15px;font-weight:700;font-family:var(--body)}
+.cols li{font-size:14.5px;color:var(--muted);padding:2px 0}
+.cols ul{margin:0;padding-left:18px}
+.flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid var(--rule);border-radius:6px;overflow:hidden;background:var(--surface)}
+.flow > div{padding:18px;border-right:1px solid var(--rule);min-width:0}
+.flow > div:last-child{border-right:0}
+.flow b{display:block;font-size:13px;color:var(--accent);margin-bottom:6px;font-weight:700}
+.flow p{font-size:14.5px}
+.flow ul.cell{margin:0;padding-left:16px}.flow ul.cell li{font-size:14px;padding:2px 0}
+.metrics{width:100%;border-collapse:collapse;font-size:14.5px}
+.metrics caption{text-align:left;font-weight:700;padding-bottom:10px;font-size:15px}
+.metrics th,.metrics td{padding:9px 16px 9px 0;border-bottom:1px solid var(--rule);text-align:left}
+.metrics th{font-weight:600;color:var(--muted);font-size:13px}
+.metrics td.n{font-family:var(--data);font-size:13.5px;color:var(--probe);white-space:nowrap}
+.tbl{overflow-x:auto}
+.pipe{display:flex;flex-wrap:wrap;gap:0;align-items:stretch;border:1px solid var(--rule);border-radius:6px;overflow:hidden;background:var(--surface)}
+.pipe > div{flex:1 1 150px;padding:16px 18px;border-right:1px solid var(--rule);min-width:0}
+.pipe > div:last-child{border-right:0}
+.pipe small{display:block;font-family:var(--data);font-size:12px;color:var(--probe)}
+.pipe b{display:block;font-size:15px;margin-top:4px}
+.pipe p{font-size:13.5px;color:var(--muted);margin-top:4px}
+.ask{display:block;border:1.5px dashed var(--accent);border-radius:6px;padding:12px 14px;font-size:14.5px;color:var(--ink);background:color-mix(in srgb,var(--accent) 7%,transparent)}
+.ask::before{content:"작성 필요 ";font-weight:700;color:var(--accent)}
+
+/* base work */
+.spec{width:100%;border-collapse:collapse;font-size:15px}
+.spec th,.spec td{text-align:left;vertical-align:top;padding:13px 16px 13px 0;border-bottom:1px solid var(--rule)}
+.spec th{width:170px;font-weight:600;padding-right:28px}
+.spec td{color:var(--muted)}
+.spec td .v{font-family:var(--data);font-size:13px;color:var(--probe)}
+.spec td strong{color:var(--ink);font-weight:500}
+.tl{list-style:none;margin:40px 0 0;padding:0}
+.tl > li{display:grid;grid-template-columns:150px 170px minmax(0,1fr);gap:20px;padding-block:14px;border-bottom:1px solid var(--rule);font-size:15px}
+.tl .when{font-family:var(--data);font-size:12.5px;color:var(--muted);padding-top:3px}
+.tl .co{font-weight:700}
+.tl .co span{display:block;font-weight:400;font-size:13.5px;color:var(--muted)}
+.tl .what{color:var(--muted)}
+.wins{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 36px;margin-top:44px}
+.win h4{font-family:var(--body);font-size:16px;font-weight:700}
+.win p{font-size:14.5px;color:var(--muted);margin-top:6px}
+.win .r{color:var(--ok);font-weight:600}
+
+.contact{display:grid;grid-template-columns:200px minmax(0,1fr);gap:32px;padding-block:76px 100px;border-top:1px solid var(--rule)}
+.contact .k{color:var(--muted);font-size:14px;padding-top:9px}
+.contact h2{font-size:clamp(26px,3.2vw,38px);font-weight:700;font-stretch:112%}
+.contact dl{display:grid;grid-template-columns:auto 1fr;gap:10px 24px;margin:22px 0 0}
+.contact dt{color:var(--muted)}
+.contact dd{margin:0;font-family:var(--data);font-size:15px;user-select:all}
+.cert-t{margin-top:28px;max-width:560px}.cert-t td{color:var(--muted)}.cert-t td:first-child{color:var(--ink);font-weight:500}
+
+@media (max-width:900px){
+  .hero{grid-template-columns:1fr;gap:36px;padding-block:40px}
+  .sec-head,.proj-top,.contact{grid-template-columns:1fr;gap:10px}
+  .indent{margin-left:0}
+  .stance{grid-template-columns:1fr}
+  .stance > div + div{padding-left:0;border-left:0;border-top:1px solid var(--rule)}
+  .shots2,.cols,.wins{grid-template-columns:1fr}
+  .flow{grid-template-columns:1fr 1fr}
+  .flow > div:nth-child(2){border-right:0}
+  .flow > div:nth-child(-n+2){border-bottom:1px solid var(--rule)}
+  .pipe > div{flex-basis:100%;border-right:0;border-bottom:1px solid var(--rule)}
+  .tl > li{grid-template-columns:1fr;gap:2px}
+  .spec th{width:auto;display:block;padding-bottom:0;border:0}
+  .spec td{display:block}
+  .proj-top .idx{font-size:40px}
+}
+
+/* ---------- v2 overrides ---------- */
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:#fff}
+.top{margin-inline:calc(-1 * max(16px, env(safe-area-inset-left,0px)));padding-inline:max(16px, env(safe-area-inset-left,0px));
+    background:
+   radial-gradient(60% 70% at 85% 30%, rgba(31,95,191,.10), transparent 70%),
+   radial-gradient(circle at 1px 1px, rgba(14,27,42,.10) 1px, transparent 1.3px) 0 0/22px 22px,
+   linear-gradient(180deg,#F1F5FB 0%,#FFFFFF 100%);
+  border-bottom:1px solid var(--rule)}
+.barin{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.bar{display:block;position:sticky;top:env(safe-area-inset-top,0px);z-index:20;border-bottom:0;padding-block:16px;
+  background:rgba(255,255,255,.78);backdrop-filter:saturate(1.4) blur(10px);-webkit-backdrop-filter:saturate(1.4) blur(10px);
+  margin-inline:calc(-1 * max(16px, env(safe-area-inset-left,0px)));padding-inline:max(16px, env(safe-area-inset-left,0px));box-shadow:0 1px 0 var(--rule)}
+.bar .id{color:var(--ink)}
+.bar .id::before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--accent);margin-right:10px;box-shadow:0 0 0 4px var(--accent-soft);vertical-align:1px}
+.bar nav a{padding:4px 10px;border-radius:999px}
+.bar nav a:hover{background:var(--accent-soft);color:var(--accent)}
+.hero{padding-block:72px 80px}
+.hero h1{font-size:clamp(44px,6.4vw,80px);color:var(--ink)}
+.hero h1 small{display:inline-block;margin-top:18px;padding:5px 14px;border-radius:999px;background:#fff;border:1px solid var(--rule);font-size:clamp(13px,1.3vw,15px);color:var(--muted)}
+.hero .role{color:var(--ink)}
+.facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;max-width:460px}
+.facts > div{background:#fff;border:1px solid var(--rule);border-radius:12px;padding:12px 16px;box-shadow:var(--shadow)}
+.facts b{color:var(--accent)}
+.scope{border-radius:14px;box-shadow:0 30px 60px -30px rgba(14,27,42,.45),0 0 0 1px rgba(14,27,42,.08)}
+section{border-top:0;padding-block:88px}
+section:nth-of-type(odd){background:var(--band);box-shadow:0 0 0 100vmax var(--band);clip-path:inset(0 -100vmax)}
+.sec-head .k{color:var(--accent);font-weight:600}
+.sec-head h2{color:var(--ink)}
+.stance{border-top:0;gap:18px}
+.stance > div,.stance > div + div{background:var(--surface);border:1px solid var(--rule);border-radius:14px;padding:22px 22px 18px;box-shadow:var(--shadow);border-left:1px solid var(--rule)}
+.stance h3{color:var(--accent)}
+.stance .ev{color:var(--muted);font-family:var(--body);font-size:13px;border-top:1px dashed var(--rule);padding-top:10px}
+.pull{border-radius:14px;box-shadow:var(--shadow);background:var(--surface);max-width:none}
+.pull .lead{font-size:18px;color:var(--ink)}
+.pull ul.ex li::marker{color:var(--accent)}
+.map{border-radius:14px;box-shadow:var(--shadow)}
+.proj-top .idx{color:var(--accent);opacity:.9}
+.proj-top .when{display:inline-block;margin-top:14px;padding:2px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-family:var(--body);font-weight:600}
+.stack span{background:var(--accent-soft);border-color:transparent;color:var(--accent);font-weight:500}
+.shot{border-radius:12px;box-shadow:0 24px 48px -28px rgba(14,27,42,.45),0 0 0 1px rgba(14,27,42,.08)}
+.flow,.pipe{border-radius:14px;box-shadow:var(--shadow);background:var(--surface)}
+.flow b{color:var(--accent)}
+.pipe small{color:var(--accent)}
+.cols > div{background:var(--surface);border:1px solid var(--rule);border-radius:14px;padding:20px 22px}
+.cols li::marker,.flow li::marker{color:var(--accent)}
+.metrics td.n{color:var(--accent)}
+.tbl{background:var(--surface);border:1px solid var(--rule);border-radius:14px;padding:18px 22px;box-shadow:var(--shadow)}
+.spec td .v{color:var(--accent)}
+.win{background:var(--surface);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;box-shadow:var(--shadow)}
+.contact{border-top:0;margin-top:8px}
+.contact .k{color:var(--accent);font-weight:600}
+.contact dl{background:var(--accent-soft);border-radius:14px;padding:18px 22px;display:inline-grid}
+@media (max-width:900px){.hero{padding-block:44px 52px}}
+</style>
+<style>html{-webkit-text-size-adjust:100%}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+
+
+<header class="bar"><div class="wrap barin">
+    <span class="id">LEE TAEWOO</span>
+    <nav aria-label="섹션">
+      <a href="#why">방향</a><a href="#projects">프로젝트</a><a href="#base">배경 경력</a><a href="#contact">연락처</a>
+    </nav>
+  </div></header>
+<div class="top"><div class="wrap">
+
+  <div class="hero">
+    <div>
+      <h1>AI 활용 사례<small>이태우 · Machine Vision Optical Engineer · 경력 9년</small></h1>
+      <p class="role">9년간 현장에서 쌓은 광학·비전 경험을, 이제 AI 에이전트로 검토와 검증을 빠르게 하는 도구로 만들고 있습니다.</p>
+      <p class="lede">측정·보고서용 영상 분석 도구, 노드 기반 검사 프로그램, 딥러닝 학습·추론 엔진. 육아휴직 기간(2026년 9–10월)에 현장에서 아쉬웠던 도구 세 가지를 만들어 하나로 연결했습니다.</p>
+      <div class="facts num">
+        <div><b>3개</b>직접 만든 비전 SW</div>
+        <div><b>32개</b>검사 노드</div>
+        <div><b>0.047 px</b>패턴 위치 오차</div>
+        <div><b>하루</b>광학 데모 → 검사 콘셉트 보고서</div>
+      </div>
+    </div>
+    <div>
+      <figure class="scope" aria-label="캘리퍼 방식으로 부품 모서리를 찾아 치수를 판정하는 검사 화면 재현">
+        <div class="scope-head"><span>Find Line · Caliper × 12</span><span id="hz">tact — ms</span></div>
+        <canvas id="cv" width="800" height="600"></canvas>
+        <div class="scope-foot num"><span id="ro">angle — · rms — px</span><span class="verdict" id="vd">OK</span></div>
+      </figure>
+      <p class="scope-note">NodeVision SW의 Find Line 방식을 웹에서 재현한 화면입니다. 부품이 돌아가도 검사 영역이 패턴 좌표를 따라갑니다.</p>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="wrap">
+  <section id="why">
+    <div class="sec-head">
+      <div class="k">왜 만들었나</div>
+      <div>
+        <h2>본업은 광학계 검토와 검사 설계입니다. AI 에이전트는 그 본업을 넓히는 도구입니다</h2>
+        <p>SW 인력을 대신하려는 것은 아닙니다. 고객 맞춤 UI나 AI를 쓸 수 없는 FAB 환경처럼 SW 팀이 꼭 필요한 일은 여전히 많습니다. 다만 앞으로는 AI에 의존하는 사람과 AI로 더 많은 일을 해내는 사람으로 나뉠 것이라 보고, 저는 후자가 되려고 합니다.</p>
+      </div>
+    </div>
+    <div class="indent">
+      <div class="stance">
+        <div>
+          <h3>새 기술 습득</h3>
+          <ul><li>AI 코딩 에이전트(Codex·Claude)에게 일을 나눠 지시하고 결과를 검증하는 방법을 익힘</li><li>HALCON·Cognex가 쓰는 알고리즘 원리를 문서로 조사해 구현 방향을 정함</li><li>현장에서 SW 문제가 가장 많이 나는 지점을 요구사항으로 먼저 짚어 줌</li></ul>
+          <p class="ev">코드는 에이전트 · 설계와 검증은 직접</p>
+        </div>
+        <div>
+          <h3>자동화</h3>
+          <ul><li>반복 측정·폴더 일괄 검사를 버튼 하나로</li><li>학습 → 내보내기 → 검증을 명령 한 줄로</li><li>고칠 때마다 회귀 시험·화면 시험 자동 실행</li></ul>
+          <p class="ev">정답 좌표 회귀 시험 · 화면 자동 캡처 시험</p>
+        </div>
+        <div>
+          <h3>내재화</h3>
+          <ul><li>상용 툴·외부에 맡기던 검사 레시피와 AI 재학습을 직접 운영 가능한 형태로</li><li>설치 파일, 라이선스 발급, 사용자·실습 매뉴얼까지 제작</li></ul>
+          <p class="ev">설치 파일 · 사용자/실습 매뉴얼 · 라이선스</p>
+        </div>
+      </div>
+      <div class="pull"><p class="lead">AI가 코드를 쓴다고 누구나 이런 프로그램을 만들 수 있는 것은 아닙니다. 무엇을 만들지 분명하게 지시하고, 어느 과정에서 문제가 가장 많이 생기는지 겪어 본 사람이 알려 줘야 AI도 제대로 일합니다.</p>
+<ul class="ex"><li>조명·위치 변동으로 생기는 과검출 → 기준 영상 비교</li><li>작업자 공차 남용 → 티칭 범위 제한</li><li>레시피 실수 → 레시피 관리이력 로그화</li><li>기구물의 공차 수준 ↔ 광학계 검사사양 최적화</li></ul>
+<h3>AI 에이전트와 일하는 방식</h3><ul>
+ <li><b>제가 정하는 것:</b> 무엇을 만들지, 어떤 방식이 현장에 맞는지, 결과가 맞는지</li>
+ <li><b>에이전트가 하는 것:</b> 코드 작성(Codex · Claude), 테스트 실행, 문서 초안</li>
+ <li><b>이어받기:</b> 기능마다 작업 이력 문서를 남겨 다음 작업자(사람이든 에이전트든)가 바로 이어감</li>
+ <li><b>SW 팀과는:</b> 요구사항을 말 대신 동작하는 프로토타입으로 전달</li></ul></div>
+    </div>
+  </section>
+
+  <section id="projects">
+    <div class="sec-head">
+      <div class="k">프로젝트</div>
+      <div>
+        <h2>뷰어에서 검사기로, 검사기에서 AI로</h2>
+        <p>세 프로그램은 따로 만든 것이 아니라 차례로 이어졌습니다. 뷰어의 측정·전처리 기능이 검사기의 기반이 되었고, AI 엔진이 학습한 모델은 검사기의 노드 하나로 들어갑니다.</p>
+      </div>
+    </div>
+
+    <div class="map" role="img" aria-label="ImageViewer V2의 측정 기능이 NodeVision SW로 이식되고, VisionForge AI가 학습한 .vfpkg 모델이 NodeVision의 AI Inspect 노드로 들어가는 구조도">
+      <svg viewBox="0 0 1040 250" xmlns="http://www.w3.org/2000/svg">
+        <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--accent)"/></marker></defs>
+        <g fill="none" stroke="var(--rule)" stroke-width="1.5">
+          <rect x="10" y="60" width="250" height="130" rx="6" fill="var(--bg)"/>
+          <rect x="395" y="30" width="250" height="190" rx="6" fill="var(--bg)" stroke="var(--accent)"/>
+          <rect x="780" y="60" width="250" height="130" rx="6" fill="var(--bg)"/>
+        </g>
+        <g fill="var(--ink)">
+          <text x="30" y="92" font-size="13" fill="var(--probe)">01 · 2026.09</text>
+          <text x="30" y="118" font-size="19" font-weight="700">ImageViewer V2</text>
+          <text x="30" y="145" font-size="13.5" fill="var(--muted)">측정 · 프로파일 · 이진화</text>
+          <text x="30" y="166" font-size="13.5" fill="var(--muted)">ImageJ 기능을 한 화면에</text>
+          <text x="415" y="62" font-size="13" fill="var(--probe)">02 · 2026.10</text>
+          <text x="415" y="88" font-size="19" font-weight="700">NodeVision SW</text>
+          <text x="415" y="115" font-size="13.5" fill="var(--muted)">노드 연결로 검사 레시피 제작</text>
+          <text x="415" y="136" font-size="13.5" fill="var(--muted)">Designer + 현장용 Runtime</text>
+          <text x="415" y="157" font-size="13.5" fill="var(--muted)">PLC · Modbus · 4캠 얼라인</text>
+          <text x="415" y="196" font-size="13" fill="var(--accent)" font-weight="600">AI Inspect 노드</text>
+          <text x="800" y="92" font-size="13" fill="var(--probe)">03 · 2026.09–10</text>
+          <text x="800" y="118" font-size="19" font-weight="700">VisionForge AI</text>
+          <text x="800" y="145" font-size="13.5" fill="var(--muted)">라벨링 · 학습 · C++ 추론</text>
+          <text x="800" y="166" font-size="13.5" fill="var(--muted)">Segmentation / Classification</text>
+        </g>
+        <g stroke="var(--accent)" stroke-width="1.8" fill="none">
+          <path d="M262 125 H390" marker-end="url(#ar)"/>
+          <path d="M778 125 H650" marker-end="url(#ar)"/>
+        </g>
+        <g font-size="12.5" fill="var(--muted)">
+          <text x="276" y="113">측정 · 전처리 이식</text>
+          <text x="664" y="113">학습망 .vfpkg</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="ai" style="margin-top:88px">
+      <!-- 01 ImageViewer -->
+      <article class="proj">
+        <div class="proj-top">
+          <div><div class="idx">01</div><span class="when">2026.09</span></div>
+          <div>
+            <h3>ImageViewer V2: ImageJ 기능을 현장 동선에 맞게 다시 묶은 영상 분석 도구</h3>
+            <p class="sub">광학 검토보고서를 많이 쓰면서, 고객은 "영상이 잘 보인다"보다 "이 광학계로 이렇게 검사된다"를 보여 줄 때 수주 확률이 높다는 것을 알게 됐습니다. SW 팀에 검사 콘셉트를 매번 설명하는 대신 광학 엔지니어가 직접 검사 장면을 만들 수 있는 도구를 만들었습니다.</p>
+            <div class="stack"><span>C# .NET 8</span><span>WPF</span><span>OpenCvSharp</span><span>ImageJ 방식 Threshold 17종</span><span>16-bit · float 영상</span></div>
+          </div>
+        </div>
+        <figure><div class="shot"><img src="img/iv_main.jpg" alt="ImageViewer V2 메인 화면. 영상 위 ROI와 Draw Line 측정(L 349.29 mm, dT 10.01°), 하단 실행 로그, 상태줄의 px·mm 좌표와 RGB 값" loading="lazy"></div>
+        <figcaption>Draw Line으로 길이·ΔX·ΔY·각도를 재고, 그 선을 기준으로 영상을 수평 회전해 새 탭에 엽니다. 상태줄에는 px와 mm 좌표, R·G·B·Gray 값이 함께 나옵니다.</figcaption></figure>
+        <div class="flow">
+          <div><b>문제</b><ul class="cell"><li>ImageJ로도 Threshold·Gray 그래프·측정은 되지만 화면이 보고서용으로 쓰기엔 전문성과 시인성이 부족</li><li>검사 콘셉트를 보여 주려면 SW 팀과 반복 소통 필요</li></ul></div>
+          <div><b>내 역할</b><p>필요한 기능과 화면 동선 정의, 실제 영상으로 측정값·프로파일·이진화 결과 검증</p></div>
+          <div><b>AI 활용</b><p>코딩 에이전트로 구현. 프로파일·격자·회전 화면을 자동 캡처하는 회귀 시험으로 고칠 때마다 확인</p></div>
+          <div><b>결과</b><ul class="cell"><li><strong>광학 검토보고서 제작에 실제 사용 중</strong>, 고객 반응 좋음</li><li>광학계 데모 구성 하루 만에 검사 콘셉트 결과까지 보고서로 전달</li><li>같은 양식의 보고서로 회사 안에서 통일</li></ul></div>
+        </div>
+        <div class="shots2">
+          <figure><div class="shot"><img src="img/iv_profile.jpg" alt="선 위 밝기 프로파일. Gray·R·G·B 곡선과 커서 위치의 서브픽셀 값" loading="lazy"></div><figcaption>선 위 밝기 프로파일. 채널을 겹쳐 보고 서브픽셀 값을 읽습니다. ELB 개조 때 Blue 채널을 고른 것 같은 판단을 이 화면에서 합니다.</figcaption></figure>
+          <figure><div class="shot"><img src="img/iv_grid.jpg" alt="2000% 이상 확대 시 픽셀 격자와 각 픽셀 값이 표시된 화면" loading="lazy"></div><figcaption>2000% 이상 확대하면 픽셀마다 값이 찍힙니다. 16-bit와 float 원값도 그대로 보여 줍니다.</figcaption></figure>
+        </div>
+      </article>
+
+      <!-- 02 NodeVision -->
+      <article class="proj">
+        <div class="proj-top">
+          <div><div class="idx">02</div><span class="when">2026.10 – 진행 중 · v1.1.0</span></div>
+          <div>
+            <h3>NodeVision SW: 코딩 없이 노드를 이어 만드는 머신비전 검사 프로그램</h3>
+            <p class="sub">패턴 찾기 → 좌표 따라가기 → 직선 찾기 → 치수 판정을 선으로 이으면 검사 레시피가 됩니다. 엔지니어가 쓰는 Designer와 작업자가 쓰는 Runtime으로 나눴습니다.</p>
+            <div class="stack"><span>C# .NET 8</span><span>WPF</span><span>OpenCvSharp 4.10</span><span>PLC · Modbus · MC · TCP</span><span>ECDSA 서명 라이선스</span><span>설치 파일 배포</span></div>
+          </div>
+        </div>
+        <figure><div class="shot"><img src="img/nv_designer.jpg" alt="NodeVision Designer. 회전된 부품 영상과 검출 오버레이, 아래에 Image Input, Part Pattern, Top/Bottom/Left edge, Height, Corner 노드 그래프" loading="lazy"></div>
+        <figcaption>Designer. 부품이 돌아가도 Part Pattern의 좌표(Pose)를 따라 Find Line 영역이 함께 움직이고, Height 노드가 두 직선 사이 거리를 mm로 판정합니다. 전체 판정 OK, 40.2 ms.</figcaption></figure>
+        <div class="flow">
+          <div><b>문제</b><ul class="cell"><li>상용 비전 툴은 1식당 250만 원(VisionPro)~500만 원(HALCON Runtime)</li><li>알고리즘을 직접 다듬을 수 있으면 원가 절감 여지</li><li>AI 에이전트 발전 속도를 볼 때 지금부터 대비가 필요</li></ul></div>
+          <div><b>내 역할</b><p>검사 흐름·화면 설계, 알고리즘 방식 선정, 정확도 시험 설계, 매뉴얼과 실습 교재 기획</p></div>
+          <div><b>AI 활용</b><p>Codex·Claude로 구현하고 기능별 인계 문서 작성. 1.1.0은 현업 불만 25건과 상용 툴 화면 패턴 18건을 조사해 개선 항목 9개를 정함</p></div>
+          <div><b>결과</b><ul class="cell"><li>32개 노드, 설치 파일, 사용자·실습 매뉴얼까지 갖춘 1.1.0</li><li>현업 고객이 요청하는 기능을 계속 추가하는 중</li><li>현장 적용 검증은 아직</li></ul></div>
+        </div>
+        <div class="cols">
+          <div><h4>검사 알고리즘</h4><ul><li>형상(에지 방향) 매칭 + NCC, 회전·스케일·다중 검출</li><li>캘리퍼 Find Line: 가우시안 미분, 서브픽셀, RANSAC + TLS</li><li>Blob, 바코드·2D 코드, 렌즈 왜곡 보정</li></ul></div>
+          <div><h4>현장에서 겪은 문제를 기능으로</h4><ul><li>NG 사유를 한 줄 문장으로: "Height 100.1553 mm, 허용 99.9–100.15"</li><li>OK여도 한계 10% 안이면 "OK · 경계"로 미리 경고</li><li>기준 영상과 비교해 조명 열화·위치 틀어짐을 먼저 의심하게</li><li>작업자 티칭 범위 제한으로 검사를 사실상 끄는 일 방지</li></ul></div>
+          <div><h4>설비 연동</h4><ul><li>PLC I/O, Modbus, 미쓰비시 MC, TCP 트리거, 핫폴더</li><li>4캠 얼라인(XYθ · UVW), 스테이지·회전중심 캘리브레이션</li><li>결과 CSV, NG 영상과 사유 JSON 자동 저장</li></ul></div>
+        </div>
+        <div class="shots2">
+          <figure><div class="shot"><img src="img/nv_runtime.jpg" alt="NodeVision Runtime. 큰 OK 판정, 택트 15.8 ms, 판정값별 마진 게이지와 노드별 결과 표" loading="lazy"></div><figcaption>Runtime 작업자 화면. 택트 15.8 ms, 판정값마다 여유가 얼마나 남았는지 막대로 보여 줍니다.</figcaption></figure>
+          <figure><div class="shot"><img src="img/nv_align.jpg" alt="4캠 얼라인 플로우. Cam1~4가 각각 마크를 찾고 4캠 얼라인 노드가 X, Y, T 보정량을 계산" loading="lazy"></div><figcaption>4캠 얼라인. 카메라 4대가 찾은 마크로 스테이지 보정량(X −0.1200 mm, Y 0.0800 mm, θ −0.0201°)을 계산합니다. 얼라이너 셋업 경험을 그대로 옮겼습니다.</figcaption></figure>
+        </div>
+        <div class="tbl">
+          <table class="metrics num">
+            <caption>정확도 검증: 합성 영상 640×480, 정답 좌표 대비, 조건별 10회</caption>
+            <thead><tr><th>조건</th><th>위치 오차 평균</th><th>각도 오차 평균</th></tr></thead>
+            <tbody>
+              <tr><td>패턴 매칭 · 회전 ±30°, 노이즈 σ4</td><td class="n">0.047 px</td><td class="n">0.006°</td></tr>
+              <tr><td>패턴 매칭 · 전 회전 360°</td><td class="n">0.048 px</td><td class="n">0.009°</td></tr>
+              <tr><td>패턴 매칭 · 조명 이득 0.5 + 오프셋 60</td><td class="n">0.046 px</td><td class="n">0.012°</td></tr>
+              <tr><td>패턴 매칭 · 가림 26% + 방해 원 12개</td><td class="n">0.043 px (10/10 검출)</td><td class="n">0.017°</td></tr>
+              <tr><td>Find Line · 노이즈 + 방해 원</td><td class="n">0.029 px</td><td class="n">0.0047°</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <!-- 03 VisionForge -->
+      <article class="proj">
+        <div class="proj-top">
+          <div><div class="idx">03</div><span class="when">2026.09–10</span></div>
+          <div>
+            <h3>VisionForge AI: 라벨링부터 학습, C++ 추론 엔진까지 직접 돌리는 딥러닝 검사</h3>
+            <p class="sub">상용 AI 라이선스를 들이기 전에, 이 검사에 AI가 통할지 먼저 확인하는 선검토용 도구입니다. 이차전지·수소전지 AI 외관검사에서 학습망을 관리한 경험으로 라벨링 → 학습 → 판정 전 과정을 직접 구성했습니다.</p>
+            <div class="stack"><span>PyTorch U-Net</span><span>ONNX Runtime</span><span>C++ 엔진 DLL</span><span>WPF Studio · Labeler</span><span>Segmentation · Classification</span></div>
+          </div>
+        </div>
+        <figure><div class="shot"><img src="img/vf_test.jpg" alt="VisionForge 학습망 테스트 화면. 합성 영상에서 스크래치 2개와 찍힘 1개를 blob으로 검출하고 클래스, 면적, 중심, 점수를 표로 표시" loading="lazy"></div>
+        <figcaption>학습망 테스트 화면(실제 실행 캡처). C++ 엔진이 영상을 타일 121개로 나눠 판정하고 결함 blob 3개를 클래스·면적·점수와 함께 표시합니다. 전처리 3.46 ms · 추론 7.11 ms · 후처리 1.94 ms. 공개용으로 합성 영상과 예시 패키지를 썼습니다.</figcaption></figure>
+        <div class="pipe">
+          <div><small>Labeler</small><b>결함 칠하기</b><p>클래스별 라벨, 제외 영역, OK 영상은 전부 배경</p></div>
+          <div><small>vftrain</small><b>U-Net 학습</b><p>같은 원본에서 잘린 영상은 한쪽에만 두어 검증 누출 방지</p></div>
+          <div><small>export</small><b>.vfpkg 패키지</b><p>ONNX + 정규화·임계값 manifest</p></div>
+          <div><small>verify</small><b>엔진 일치 검증</b><p>Python 결과와 C++ 엔진 결과를 영상마다 비교</p></div>
+          <div><small>NodeVision</small><b>AI Inspect 노드</b><p>패턴 좌표에 맞춰 잘라 판정, 결함 blob 표시</p></div>
+        </div>
+        <div class="flow">
+          <div><b>문제</b><ul class="cell"><li>AI 검사 검토에는 상용 AI 툴 라이선스가 필요, 비용은 최대 약 1,000만 원</li><li>라이선스가 없는 회사·단계에서는 AI 적용 가능성을 미리 볼 방법이 없음</li></ul></div>
+          <div><b>내 역할</b><p>현장 학습망 운영 경험으로 학습 규칙 정의: 누출 없는 분할, 과검출 위치 재학습, 부모 학습망에 이어 학습</p></div>
+          <div><b>AI 활용</b><p>코딩 에이전트로 학습 파이프라인·C++ 엔진·Studio UI 구현. 엔진 결과를 Python 기준과 자동 비교해 검증</p></div>
+          <div><b>결과</b><ul class="cell"><li>CPU만으로 27장 학습 14.5분</li><li>엔진 결과 27/27 일치(확률 최대 차이 0.0007)</li><li>현장 적용 검증은 아직</li></ul></div>
+        </div>
+        <div class="cols">
+          <div><h4>과검출을 학습으로 돌려주기</h4><ul><li>테스트 화면에서 "양품 맞음"으로 확인한 위치를 기록</li><li>재학습 때 그 둘레를 약 50% 확률로 집중 샘플링, 손실 3배</li></ul></div>
+          <div><h4>현장 영상 그대로</h4><ul><li>8192×2000 같은 라인스캔 원본도 타일로 나눠 판정</li><li>영상 크기가 섞여도 학습 가능, 줄이지 않고 같은 해상도로</li></ul></div>
+          <div><h4>이어 학습</h4><ul><li>학습에 쓴 영상과 라벨을 사본으로 보관</li><li>현장 영상이 지워져도 부모 학습망에 새 라벨만 더해 재학습</li></ul></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section id="base">
+    <div class="sec-head">
+      <div class="k">배경 경력</div>
+      <div>
+        <h2>이 도구들은 9년의 현장에서 나왔습니다</h2>
+        <p>자세한 내용은 제출한 경력기술서에 있습니다. 여기에는 위 프로젝트와 이어지는 부분만 추렸습니다.</p>
+      </div>
+    </div>
+    <div class="indent">
+      <div class="tbl">
+        <table class="spec">
+          <tr><th>Camera</th><td><span class="v">Line 1K–32K · TDI/CIS · Area Color/Mono/NIR/SWIR</span></td></tr>
+          <tr><th>Lens</th><td><span class="v">Telecentric · Macro · 1–15× 전동 줌</span><br><strong>0.5 µm 분해능급</strong> 고배율 AOI와 얼라인 모듈 설계·셋업</td></tr>
+          <tr><th>Illumination</th><td><span class="v">Coaxial · Dark Field · Oblique · Photometric Stereo</span><br>반사 조건에 따른 결함 가시화</td></tr>
+          <tr><th>PoC</th><td>분해능·FOV·WD 검토, 광학 조건별 검출력 문서화, <strong>연간 100억 규모</strong> 광학계 검토보고서</td></tr>
+        </table>
+      </div>
+      <ol class="tl" reversed>
+        <li><div class="when num">2025.04–현재</div><div class="co">신도기연<span>생산기술 · 대리</span></div><div class="what">EHD 마이크로 디스펜서 ELB 핵심공정 달성, 잉크젯 도포공정</div></li>
+        <li><div class="when num">2022.03–2025.03</div><div class="co">더블유지에스<span>솔루션팀 · 매니저</span></div><div class="what">이차전지·수소전지 AI 외관검사, Photomask AOI(1 µm 라인스캔), ELB 도포 개조</div></li>
+        <li><div class="when num">2019.04–2021.11</div><div class="co">동일솔루션<span>연구소 · 선임연구원</span></div><div class="what">OLED Evaporator/ALD Aligner, MLCC 검사, 폴란드 이차전지 물류 PM·CS</div></li>
+        <li><div class="when num">2017.09–2019.03</div><div class="co">엔엠시스코<span>SW/시스템 · 주임</span></div><div class="what">Align·Laser Cutting·Sputter Aligner 비전 프로그램 개발·셋업</div></li>
+      </ol>
+      <div class="wins">
+        <div class="win"><h4>ELB 도포액 검출 광학계 개조</h4><p>동축 차영상 방식의 과검출을 DF Red Ring 조명과 Blue 채널 분리로 해결. <span class="r">10개 양산라인 셋업, 이후 경쟁사 라인도 같은 콘셉트 채택</span></p></div>
+        <div class="win"><h4>0.5 µm Wafer Bonding 얼라인</h4><p>좁은 공간에 1–15× 전동 줌 광학계 8개 배치, 줌마다 움직이는 광축 중심을 마스터 Photomask로 보정. <span class="r">8축 배치안 확보</span></p></div>
+        <div class="win"><h4>레이저–카메라 좌표 오프셋</h4><p>오프셋을 시각화해 술통형 렌즈 왜곡을 찾고, 레이저로 체커보드를 그려 캘리브레이션. <span class="r">좌표 오프셋 해결</span></p></div>
+        <div class="win"><h4>폴란드 이차전지 물류 프로젝트</h4><p>셋업·PM과 함께 영어·폴란드어·우크라이나어 설비 매뉴얼 500쪽을 현지 인력과 직접 제작. <span class="r">외부 견적 1,800만 → 600만 원</span></p></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="contact" id="contact">
+    <div class="k">연락처</div>
+    <div>
+      <h2>광학계 검토와 PoC, 그리고 그 일을 더 빠르게 만드는 도구</h2>
+      <dl>
+        <dt>이메일</dt><dd>Leecornell0131@gmail.com</dd>
+        <dt>전화</dt><dd class="num">010-6385-1241</dd>
+      </dl>
+      <table class="metrics cert-t num"><tbody>
+ <tr><td>정보처리기사</td><td class="n">2015.10</td><td>한국산업인력공단</td></tr>
+ <tr><td>컴퓨터 교원자격증</td><td class="n">2015.02</td><td>목원대학교</td></tr>
+ <tr><td>OPIc 영어</td><td class="n">IM2</td><td>해외 엔지니어와 기술 소통</td></tr>
+ <tr><td>학력</td><td class="n">2009–2015</td><td>목원대학교 컴퓨터교육과</td></tr>
+ <tr><td>해외 프로젝트 경험</td><td colspan="2">중국 · 베트남 · 태국 · 폴란드 · 인도</td></tr>
+ </tbody></table>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const cv=document.getElementById('cv'); if(!cv) return;
+  const g=cv.getContext('2d'), W=cv.width, H=cv.height;
+  const ro=document.getElementById('ro'), vd=document.getElementById('vd'), hz=document.getElementById('hz');
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const bg=document.createElement('canvas'); bg.width=W; bg.height=H;
+  const bx=bg.getContext('2d'), id=bx.createImageData(W,H);
+  let s=7; const rnd=()=>{s=(s*16807)%2147483647;return s/2147483647};
+  for(let i=0;i<W*H;i++){const v=66+rnd()*26+(i%W)/W*10; id.data[i*4]=v;id.data[i*4+1]=v;id.data[i*4+2]=v+2;id.data[i*4+3]=255}
+  bx.putImageData(id,0,0);
+  const part=[[-150,-95],[150,-95],[150,20],[90,20],[90,95],[-150,95]];
+  function draw(t){
+    const ang=reduce?11.99:12+Math.sin(t/2600)*9, dx=reduce?0:Math.sin(t/3900)*26, dy=reduce?0:Math.cos(t/4700)*16;
+    const a=ang*Math.PI/180, c=Math.cos(a), sn=Math.sin(a), cx=W/2+dx, cy=H/2+dy;
+    const T=(x,y)=>[cx+x*c-y*sn, cy+x*sn+y*c];
+    g.drawImage(bg,0,0);
+    g.beginPath(); part.forEach((p,i)=>{const q=T(p[0],p[1]); i?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1])}); g.closePath();
+    g.fillStyle='#BFC3C4'; g.fill();
+    g.fillStyle='#22282B'; g.beginPath(); const h=T(-85,-25); g.arc(h[0],h[1],26,0,7); g.fill();
+    g.save(); g.translate(...T(-20,45)); g.rotate(a); g.fillRect(-45,-10,90,20); g.restore();
+    g.save(); g.translate(cx,cy); g.rotate(a);
+    g.strokeStyle='#4ED38A'; g.lineWidth=2; g.strokeRect(-178,-122,356,244);
+    g.beginPath(); g.moveTo(-12,0);g.lineTo(12,0);g.moveTo(0,-12);g.lineTo(0,12); g.stroke();
+    g.lineWidth=1.2;
+    for(let k=0;k<12;k++){const x=-140+k*24.5; g.strokeStyle='rgba(80,190,215,.9)'; g.strokeRect(x-6,-120,12,50);
+      const e=-95+(reduce?0:Math.sin(t/180+k*1.7)*0.6); g.fillStyle='#F2B84B'; g.fillRect(x-2.5,e-2.5,5,5);}
+    g.strokeStyle='#F2B84B'; g.lineWidth=2.2; g.beginPath(); g.moveTo(-168,-95); g.lineTo(168,-95); g.stroke();
+    for(let k=0;k<6;k++){const y=-80+k*30; g.strokeStyle='rgba(80,190,215,.9)'; g.lineWidth=1.2; g.strokeRect(-175,y-6,50,12); g.fillStyle='#F2B84B'; g.fillRect(-152.5,y-2.5,5,5);}
+    g.strokeStyle='#F2B84B'; g.lineWidth=2.2; g.beginPath(); g.moveTo(-150,-110); g.lineTo(-150,110); g.stroke();
+    g.strokeStyle='#E25BE0'; g.lineWidth=1.5; g.setLineDash([5,4]); g.beginPath(); g.moveTo(120,-95); g.lineTo(120,20); g.stroke(); g.setLineDash([]);
+    g.restore();
+    const rms=(0.014+(reduce?0.004:Math.abs(Math.sin(t/900))*0.008)).toFixed(3);
+    const hmm=reduce?100.03:100.04+Math.sin(t/5200)*0.11;
+    const ok=hmm<=100.15;
+    ro.textContent=`angle ${ang.toFixed(3)}° · rms ${rms} px · height ${hmm.toFixed(3)} mm`;
+    vd.textContent=ok?(hmm>100.135?'OK · 경계':'OK'):'NG · 치수 초과';
+    vd.className='verdict'+(ok?'':' ng');
+    hz.textContent=`tact ${(14.6+(reduce?0:Math.abs(Math.sin(t/700))*1.6)).toFixed(1)} ms`;
+  }
+  draw(0);
+  if(reduce) return;
+  let last=0; function loop(t){ if(t-last>66){draw(t);last=t} requestAnimationFrame(loop)}
+  requestAnimationFrame(loop);
+})();
+</script>
+
+</body>
+</html>
